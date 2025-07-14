@@ -1,0 +1,15 @@
+{
+    "name": "manabank",
+    "version": "1.0.0",
+    "description": "MTG mana allocation tool build with react, redux, node, and MTGJSON",
+    "scripts": {
+        "client": "npm start --prefix client",
+        "server": "nodemon server/server.js",
+        "get-cards": "node scripts/downloadAtomicCards.js",
+        "dev": "concurrently \"npm run server\" \"npm run client\""
+    },
+    "devDepednencies": {
+        "concurrently": "^8.2.0",
+        "nodemon": "^3.1.0"
+    }
+}
