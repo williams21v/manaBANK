@@ -31,8 +31,8 @@ const getPlayableCards = (req, res) => {
         if (canCast(cost, manaPool)) {
             playable.push(card.name);
         }
-    }
+    } 
     res.json({ playable });
 };
 
-module.exports = { getPlayableCards}
+module.exports = { getPlayableCards }
