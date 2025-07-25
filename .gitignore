@@ -7,4 +7,4 @@ client/nuild/
 client/node_modules/
 
 #MTG JSON data
-data/AtomicCards.json
+server/data/AtomicCards.json
