@@ -32,4 +32,17 @@ function canCast(manaCostString, manaPool) {
     return true
 }
 
-module.exports = { canCast };
+function compressMana(manaArray) {
+  const counts = manaArray.reduce((acc, symbol) => {
+    acc[symbol] = (acc[symbol] || 0) + 1;
+    return acc;
+  }, {});
+  return Object.entries(counts)
+    .map(([symbol, count]) => (count > 1 ? `${count}${symbol}` : symbol))
+    .join(" ");
+}
+
+module.exports = {
+  canCast,
+  compressMana
+};
