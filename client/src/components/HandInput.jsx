@@ -1,78 +1,41 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 
-export default function HandInput({ hand, setHand }) {
+export default function HandInput({ hand, setHand, addCard }) {
   const [query, setQuery] = useState("");
-  const [suggestions, setSuggestions] = useState([]);
+  const [results, setResults] = useState([]);
 
-  useEffect(() => {
-    if (!query) {
-      setSuggestions([]);
-      return;
-    }
-    const fetchSuggestions = async () => {
-      try {
-        const res = await fetch(`http://localhost:3001/api/cards/search?q=${inputValue}`);
-        const data = await res.json();
-        setSuggestions(data.cards || []);
-      } catch (err) {
-        console.error("Error fetching suggestions:", err);
-      }
-    };
-    const debounce = setTimeout(fetchSuggestions, 300);
-    return () => clearTimeout(debounce);
-  }, [query]);
-
-  const handleAddCard = (card) => {
-    if (!hand.includes(card)) {
-      setHand([...hand, card]);
-    }
-    setQuery("");
-    setSuggestions([]);
+  const searchCards = async (q) => {
+    setQuery(q);
+    if (q.length < 2) return setResults([]);
+    const res = await fetch(`http://localhost:3001/api/cards/search?q=${q}`);
+    const data = await res.json();
+    setResults(data.cards || []);
   };
 
-  const handleRemoveCard = (card) => {
-    setHand(hand.filter((c) => c !== card));
+  const handleAddCard = (card) => {
+    addCard(card);
+    setQuery("");
+    setResults([]);
   };
 
   return (
     <div>
-      <label>Hand:</label>
+      <label>Search Cards:</label>
       <input
         type="text"
-        placeholder="Search card..."
         value={query}
-        onChange={(e) => setQuery(e.target.value)}
+        onChange={(e) => searchCards(e.target.value)}
+        placeholder="Type card name"
       />
-      {suggestions.length > 0 && (
-        <ul style={{ border: "1px solid #ccc", maxHeight: "150px", overflowY: "auto" }}>
-          {suggestions.map((name) => (
-            <li
-              key={name}
-              style={{ cursor: "pointer", padding: "4px" }}
-              onClick={() => handleAddCard(name)}
-            >
-              {name}
+      {results.length > 0 && (
+        <ul style={{ border: "1px solid gray", padding: "5px", listStyle: "none" }}>
+          {results.map((card, idx) => (
+            <li key={idx} style={{ cursor: "pointer" }} onClick={() => handleAddCard(card)}>
+              {card}
             </li>
           ))}
         </ul>
       )}
-      <div style={{ marginTop: "10px" }}>
-        {hand.map((card) => (
-          <span
-            key={card}
-            style={{
-              padding: "5px",
-              margin: "5px",
-              border: "1px solid #aaa",
-              display: "inline-block",
-              cursor: "pointer"
-            }}
-            onClick={() => handleRemoveCard(card)}
-          >
-            {card} ✕
-          </span>
-        ))}
-      </div>
     </div>
   );
 }
