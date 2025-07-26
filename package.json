@@ -1,15 +1,14 @@
 {
   "name": "manabank",
   "version": "1.0.0",
-  "main": "index.js",
+  "description": "",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "concurrently \"npm run server\" \"npm run client\"",
-    "build": "vite build",
-    "preview": "vite preview",
     "server": "nodemon server/server.js",
     "client": "npm --prefix client run dev",
-    "preinstall": "npx npm-force-resolutions"
+    "build": "vite build",
+    "preview": "vite preview"
   },
   "repository": {
     "type": "git",
@@ -22,7 +21,6 @@
     "url": "https://github.com/williams21v/manaBANK/issues"
   },
   "homepage": "https://github.com/williams21v/manaBANK#readme",
-  "description": "",
   "dependencies": {
     "cors": "^2.8.5",
     "express": "^5.1.0",
@@ -32,9 +30,5 @@
   "devDependencies": {
     "concurrently": "^9.2.0",
     "nodemon": "^3.1.10"
-  },
-  "resolutions": {
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0"
   }
 }

@@ -1,6 +1,6 @@
 import React from "react";
 
-const ManaSymbols = ["W", "U", "B", "R", "G", "C", "generic"];
+const ManaSymbols = ["W", "U", "B", "R", "G", "C", "Generic"];
 
 export default function ManaInput({ manaPool, setManaPool }) {
   const handleChange = (symbol, value) => {

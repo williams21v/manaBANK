@@ -2,10 +2,12 @@ const express = require("express");
 const cors = require("cors");
 const fs = require("fs");
 const path = require("path");
-
 const app = express();
 app.use(cors());
 app.use(express.json());
+
+const cardRoutes = require("./routes/cards");
+app.use("/api", cardRoutes);
 
 // ----------------- Load MTG AtomicCards.json -----------------
 const atomicPath = path.join(__dirname, "data", "AtomicCards.json");
@@ -106,20 +108,15 @@ app.post("/api/combo-castable", (req, res) => {
     return res.status(400).json({ error: "Missing manaPool or hand" });
   }
 
-  // Count mana pool
-  const countMana = (manaArr) =>
-    manaArr.reduce((acc, m) => {
-      acc[m] = (acc[m] || 0) + 1;
-      return acc;
-    }, {});
-
-  const poolCounts = countMana(manaPool);
+  // Convert manaPool object (like {W:1, U:2}) to counts
+  const poolCounts = { ...manaPool };
 
   // Generate combos up to 7 cards
   const allCombos = generateCombos(hand, 7);
 
   const validCombos = allCombos
     .map((combo) => {
+      // Aggregate total mana cost of this combo
       const totalCost = { generic: 0, colors: {} };
       for (const cardName of combo) {
         const cost = getManaCost(cardName);
@@ -130,19 +127,65 @@ app.post("/api/combo-castable", (req, res) => {
         }
       }
 
+      // Pay mana using the pool
       const payment = payMana(totalCost, poolCounts);
       if (!payment) return null;
 
       return {
         cards: combo,
         manaUsed: compressMana(payment.manaUsed),
-        remainingMana: compressMana(payment.remainingMana)
+        remainingMana: compressMana(payment.remainingMana),
       };
     })
     .filter(Boolean);
 
   res.json({ combos: validCombos });
 });
+
+// app.post("/api/combo-castable", (req, res) => {
+//   const { manaPool, hand } = req.body;
+
+//   if (!manaPool || !hand) {
+//     return res.status(400).json({ error: "Missing manaPool or hand" });
+//   }
+
+//   // Count mana pool
+//   const countMana = (manaArr) =>
+//     manaArr.reduce((acc, m) => {
+//       acc[m] = (acc[m] || 0) + 1;
+//       return acc;
+//     }, {});
+
+//   const poolCounts = countMana(manaPool);
+
+//   // Generate combos up to 7 cards
+//   const allCombos = generateCombos(hand, 7);
+
+//   const validCombos = allCombos
+//     .map((combo) => {
+//       const totalCost = { generic: 0, colors: {} };
+//       for (const cardName of combo) {
+//         const cost = getManaCost(cardName);
+//         if (!cost) return null;
+//         totalCost.generic += cost.generic;
+//         for (const [c, n] of Object.entries(cost.colors)) {
+//           totalCost.colors[c] = (totalCost.colors[c] || 0) + n;
+//         }
+//       }
+
+//       const payment = payMana(totalCost, poolCounts);
+//       if (!payment) return null;
+
+//       return {
+//         cards: combo,
+//         manaUsed: compressMana(payment.manaUsed),
+//         remainingMana: compressMana(payment.remainingMana)
+//       };
+//     })
+//     .filter(Boolean);
+
+//   res.json({ combos: validCombos });
+// });
 
 // ----------------- START SERVER -----------------
 const PORT = process.env.PORT || 3001;
